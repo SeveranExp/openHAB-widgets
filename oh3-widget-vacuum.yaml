@@ -1,5 +1,5 @@
-uid: tetsuo-repo-oh3-widget-vacuum
-version: 1.3.0
+uid: OpenHAB-widget-vacuum
+version: 1.3.1
 tags:
   - vacuum
   - room
@@ -7,12 +7,12 @@ tags:
   - control
 props:
   parameters:
-    - description: Prefix of item names. Look in your items for e.g. _CleaningMap and use everything before the underscore as prefix
+    - description: Prefix of item names. All of your vaccum items must have the same prefix. For e.g. RoborockS6_CleaningMap. Use everything before the underscore as prefix: RoborockS6.
       label: Item prefix
       name: itemPrefix
       required: true
       type: TEXT
-    - description: 'json array with key value rooms like this [{"icon": "chat_bubble_2","roomId": 16,"label": "Roomname"}]'
+    - description: 'json array with key value rooms like this [{"icon": "chat_bubble_2","roomId": 16,"label": "Room1 name"},{"icon": "chat_bubble_2","roomId": 16,"label": "Room2 name"}(...)]'
       label: Rooms
       name: rooms
       required: true
@@ -21,7 +21,7 @@ props:
       label: Chunk size
       name: chunkSize
       required: false
-timestamp: Jun 3, 2021, 2:47:00 PM
+timestamp: Sep 17, 2023
 component: f7-block
 slots:
   default:
@@ -32,7 +32,7 @@ slots:
           - component: f7-block
             config:
               style:
-                - width: 75%
+                - width: 55%
                 - margin: 0
                 - padding: 0
             slots:
@@ -56,15 +56,15 @@ slots:
                     style:
                       - width: 100%
                       - height: 100%
-                    value: =(items[props.itemPrefix+"_Batterieladung"].state/100)
-                    valueText: =(items[props.itemPrefix+"_Batterieladung"].state) + "%"
-                    valueTextColor: '=items[props.itemPrefix+"_Batterieladung"].state < 25 ? "#f32617" : items[props.itemPrefix+"_Batterieladung"].state < 60 ? "#ffe81e" : "#6ec071"'
+                    value: =(items[props.itemPrefix+"_BatteryLevel"].state/100)
+                    valueText: =(items[props.itemPrefix+"_BatteryLevel"].state) + "%"
+                    valueTextColor: '=items[props.itemPrefix+"_BatteryLevel"].state < 25 ? "#f32617" : items[props.itemPrefix+"_BatteryLevel"].state < 60 ? "#ffe81e" : "#6ec071"'
                     borderWidth: 18
-                    labelText: '=items[props.itemPrefix+"_ControlVacuum"].state !== "dock"? "Batterie" : "Wird aufgeladen"'
-                    borderColor: '=items[props.itemPrefix+"_Batterieladung"].state < 25 ? "#f32617" : items[props.itemPrefix+"_Batterieladung"].state < 60 ? "#ffe81e" : "#6ec071"'
+                    labelText: '=items[props.itemPrefix+"_ControlVacuum"].state !== "dock"? "Battery" : "Charging"'
+                    borderColor: '=items[props.itemPrefix+"_BatteryLevel"].state < 25 ? "#f32617" : items[props.itemPrefix+"_BatteryLevel"].state < 60 ? "#ffe81e" : "#6ec071"'
                 - component: oh-trend
                   config:
-                    trendItem: =props.itemPrefix+"_Batterieladung"
+                    trendItem: =props.itemPrefix+"_BatteryLevel"
                     trendStrokeWidth: 2
                     trendGradient:
                       - "#6ec071"
@@ -88,7 +88,7 @@ slots:
                                 default:
                                   - component: Label
                                     config:
-                                      text: '=items[props.itemPrefix+"_ControlVacuum"].state === "vacuum" ? "Dauer" : "Letzte Dauer"'
+                                      text: '=items[props.itemPrefix+"_ControlVacuum"].state === "Vacuum" ? "Duration" : "Previous Duration"'
                                       style:
                                         - fontWeight: 100
                                         - color: rgb(136, 136, 136)
@@ -104,7 +104,7 @@ slots:
                                   font-size: 2em
                             - component: f7-progressbar
                               config: 
-                                visible: =items[props.itemPrefix+"_ControlVacuum"].state === "vacuum"
+                                visible: =items[props.itemPrefix+"_ControlVacuum"].state === "Vacuum"
                                 infinite: true
                                 class: color-blue
     - component: f7-row
@@ -123,7 +123,7 @@ slots:
                           default:
                             - component: Label
                               config:
-                                text: Aktionen
+                                text: Actions
                                 style:
                                   - fontWeight: 100
                                   - color: rgb(136, 136, 136)
@@ -152,7 +152,7 @@ slots:
                           default:
                             - component: Label
                               config:
-                                text: Saugkraft
+                                text: Suction Power
                                 style:
                                   - fontWeight: 100
                                   - color: rgb(136, 136, 136)
@@ -245,7 +245,7 @@ slots:
                                 visible: =items[props.itemPrefix+"_ControlVacuum"].state !== "vacuum"
                                 iconF7: rocket
                                 iconSize: 1.2em
-                                text: '=items[props.itemPrefix+"_ControlVacuum"].state === "vacuum" ? "Wird ausgeführt" : "Ausführen"'
+                                text: '=items[props.itemPrefix+"_ControlVacuum"].state === "Vacuum" ? "Cleaning" : "Execute"'
                                 large: true
                                 action: command
                                 actionItem: =props.itemPrefix+"_ExecuteCommand"
@@ -257,7 +257,7 @@ slots:
                                   font-size: 2em
                             - component: oh-button
                               config:
-                                visible: =items[props.itemPrefix+"_ControlVacuum"].state === "vacuum"
+                                visible: =items[props.itemPrefix+"_ControlVacuum"].state === "Vacuum"
                                 iconF7: stop_circle
                                 iconSize: 1.2em
                                 text: Zurück zum Dock
